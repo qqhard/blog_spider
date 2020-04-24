@@ -2,6 +2,7 @@ import sys
 import pymongo
 
 client = pymongo.MongoClient(host='localhost', port=27017)
+client.spider.domain.create_Index({'domain': 1})
 
 cmd = sys.argv[1]
 
@@ -14,3 +15,6 @@ elif cmd == 'list_domain':
 elif cmd == 'del_domain':
     domain = sys.argv[2]
     client.spider.domain.delete_one({'domain': domain})
+elif cmd == 'update_domain':
+    pass
+

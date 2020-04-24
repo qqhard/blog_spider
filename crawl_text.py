@@ -1,7 +1,6 @@
 
 import sys
 
-
 from bs4 import BeautifulSoup, Comment
 from bs4.element import Tag
 
@@ -55,4 +54,3 @@ for o in body.findAll(text=lambda text: isinstance(text, Comment)):
 
 _,_,max_dense,max_node = cal_node_dense(body)
 print(max_node.name, max_node.attrs)
-r

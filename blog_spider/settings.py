@@ -66,6 +66,7 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'blog_spider.pipelines.BlogSpiderPipeline': 300,
+    'blog_spider.pipelines.ExtendDomainPipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

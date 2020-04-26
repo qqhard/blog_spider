@@ -15,14 +15,14 @@ class ExtendDomainSpider(scrapy.Spider):
 
     def __init__(self):
         client = pymongo.MongoClient(host='localhost', port=27017)
-        collec_domain = client.spider.domain
+        collec_domain = client.spider.candidate_domain
         # collec_new_domain = client.spider.new_domain
         allowed_domains = []
         start_urls = []
-        for o in collec_domain.find():
+        for o in collec_domain.find({'status':1}):
             domain = o.get('domain')
             allowed_domains.append(domain)
-            start_urls.append('https://'+domain)
+            start_urls.append(o.get('url'))
         self.allowed_domains = allowed_domains
         self.start_urls = start_urls
 

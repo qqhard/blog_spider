@@ -14,6 +14,8 @@ BOT_NAME = 'blog_spider'
 SPIDER_MODULES = ['blog_spider.spiders']
 NEWSPIDER_MODULE = 'blog_spider.spiders'
 
+DEPTH_LIMIT = 2
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'blog_spider (+http://www.yourdomain.com)'

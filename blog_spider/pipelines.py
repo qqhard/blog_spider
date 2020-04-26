@@ -25,7 +25,7 @@ class ExtendDomainPipeline(object):
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(host='localhost', port=27017)
-        self.raw_doc = self.client.spider.raw_doc
+        self.raw_doc = self.client.spider.raw_doc_20200426
 
     def close_spider(self, spider):
         self.client.close()

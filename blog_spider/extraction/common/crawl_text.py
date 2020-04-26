@@ -33,13 +33,16 @@ def cal_node_dense(node):
     return tag_num, char_num, max_dense, max_node
 
 
+
 html = ''
 
-while True:
-    line=sys.stdin.readline()
-    if line == '':
-        break
-    html += line
+from pymongo import MongoClient
+from pymongo.collection import Collection
+
+client = MongoClient("mongo-server")
+doc : Collection = client['blog']['doc']
+case = doc.find_one({})
+html = case['html']
 
 soup = BeautifulSoup(html)
 body = soup.body

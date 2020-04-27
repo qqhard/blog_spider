@@ -6,17 +6,21 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy import Field
 
 
 class BlogSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    url = scrapy.Field()
-    title = scrapy.Field()
-    text = scrapy.Field()
+    url = Field()
+    title = Field()
+    text = Field()
+
 
 class RawHtmlItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    url = scrapy.Field()
-    html = scrapy.Field()
+    url = Field()
+    html = Field()
+    domain = Field()
+    incid = Field()

@@ -5,27 +5,14 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import pymongo
+from blog_spider.config.LocalConfig import config
 
-class BlogSpiderPipeline(object):
-
-    collection_name = 'doc'
-
-    def open_spider(self, spider):
-        self.client = pymongo.MongoClient(host='localhost', port=27017)
-        self.db = self.client['blog']
-
-    def close_spider(self, spider):
-        self.client.close()
-
-    def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(dict(item))
-        return item
 
 class ExtendDomainPipeline(object):
 
     def open_spider(self, spider):
-        self.client = pymongo.MongoClient(host='localhost', port=27017)
-        self.raw_doc = self.client.spider.raw_doc_20200426
+        self.client = pymongo.MongoClient(config.spider_mongo_str)
+        self.raw_doc = self.client.spider.extend_raw_doc
 
     def close_spider(self, spider):
         self.client.close()

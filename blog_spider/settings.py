@@ -9,12 +9,15 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+from blog_spider.config.LocalConfig import config
+import datetime
+
 BOT_NAME = 'blog_spider'
 
 SPIDER_MODULES = ['blog_spider.spiders']
 NEWSPIDER_MODULE = 'blog_spider.spiders'
 
-DEPTH_LIMIT = 2
+DEPTH_LIMIT = 300
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -22,6 +25,22 @@ DEPTH_LIMIT = 2
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
+
+
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+SCHEDULER_PERSIST = True
+
+SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
+
+REDIS_URL = config.redis_conn_str
+
+
+REDIS_START_URLS_KEY = "blog:start_urls"
+
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -67,7 +86,7 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'blog_spider.pipelines.BlogSpiderPipeline': 300,
+    # 'blog_spider.pipelines.BlogSpiderPipeline': 300,
     'blog_spider.pipelines.ExtendDomainPipeline': 301,
 }
 
@@ -91,3 +110,10 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+today = datetime.datetime.now()
+log_file_path = "/log/blog_spider/log-{}-{}-{}.log".format(today.year, today.month, today.day)
+
+
+LOG_LEVEL= "WARNING"
+LOG_FILE = log_file_path

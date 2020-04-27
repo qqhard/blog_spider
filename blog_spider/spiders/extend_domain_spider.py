@@ -4,6 +4,7 @@ from scrapy.utils.response import get_base_url
 from scrapy import Request
 from urllib.parse import urljoin
 from blog_spider.items import RawHtmlItem
+from blog_spider.config.LocalConfig import config
 import pymongo
 import re
 
@@ -14,7 +15,7 @@ class ExtendDomainSpider(scrapy.Spider):
     name = 'extend_domain_spider'
 
     def __init__(self):
-        client = pymongo.MongoClient(host='localhost', port=27017)
+        client = pymongo.MongoClient(config.spider_mongo_str)
         collec_domain = client.spider.candidate_domain
         # collec_new_domain = client.spider.new_domain
         allowed_domains = []
@@ -29,6 +30,7 @@ class ExtendDomainSpider(scrapy.Spider):
     def parse(self, response):
         base_url = get_base_url(response)
         hrefs = response.xpath('//a/@href').extract()
+        domain = domain_pa.match(base_url).group(1)
         for url in hrefs:
             full_url = urljoin(base_url, url)
             domain_res = domain_pa.match(full_url)
@@ -39,4 +41,6 @@ class ExtendDomainSpider(scrapy.Spider):
         item = RawHtmlItem()
         item['url'] = url
         item['html'] = response.text
+        item['domain'] = domain
+
         yield item

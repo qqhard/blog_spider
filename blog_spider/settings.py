@@ -18,7 +18,7 @@ BOT_NAME = 'blog_spider'
 SPIDER_MODULES = ['blog_spider.spiders']
 NEWSPIDER_MODULE = 'blog_spider.spiders'
 
-DEPTH_LIMIT = 300
+DEPTH_LIMIT = 64
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'blog_spider (+http://www.yourdomain.com)'
@@ -30,8 +30,8 @@ DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
 
-# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
-SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
+SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
 # SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
 REDIS_URL = config.redis_conn_str

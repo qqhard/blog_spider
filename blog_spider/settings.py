@@ -115,5 +115,5 @@ today = datetime.datetime.now()
 log_file_path = "/log/blog_spider/log-{}-{}-{}.log".format(today.year, today.month, today.day)
 
 
-LOG_LEVEL= "WARNING"
+LOG_LEVEL= "INFO"
 LOG_FILE = log_file_path

@@ -11,6 +11,7 @@
 
 from blog_spider.config.LocalConfig import config
 import datetime
+import logging
 
 BOT_NAME = 'blog_spider'
 
@@ -115,5 +116,5 @@ today = datetime.datetime.now()
 log_file_path = "/log/blog_spider/log-{}-{}-{}.log".format(today.year, today.month, today.day)
 
 
-LOG_LEVEL= "INFO"
+LOG_LEVEL= logging.WARNING
 LOG_FILE = log_file_path

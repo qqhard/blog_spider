@@ -22,7 +22,6 @@ class DomainLinkExtractor(LinkExtractor):
                 return False
             url_parse_result: ParseResult = urlparse(link.url)
             if url_parse_result.hostname == domain:
-                logging.warning("ref_link--->{}\t-->\t{}".format(base_url, link.url))
                 return True
             return False
 

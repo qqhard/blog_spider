@@ -26,7 +26,7 @@ DEPTH_LIMIT = 64
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+DUPEFILTER_CLASS = "blog_spider.filter.domain_dupefilter.DomainDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
 

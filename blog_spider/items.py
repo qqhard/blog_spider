@@ -20,3 +20,7 @@ class RawHtmlItem(scrapy.Item):
     # name = scrapy.Field()
     url = scrapy.Field()
     html = scrapy.Field()
+
+class DomainLinkItem(scrapy.Item):
+    url = scrapy.Field()
+    domain = scrapy.Field()

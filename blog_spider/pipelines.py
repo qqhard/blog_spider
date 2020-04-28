@@ -25,11 +25,13 @@ class ExtendDomainPipeline(object):
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(host='localhost', port=27017)
-        self.raw_doc = self.client.spider.raw_doc_20200426
+        self.candi_domain = self.client.spider.candidate_domain
 
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
-        self.raw_doc.insert_one(dict(item))
+        domain = item['domain']
+        if self.candi_domain.find_one({'domain': domain}) is None:
+            self.candi_domain.insert_one({'domain': domain, 'url': item['url'], 'status': 0})
         return item

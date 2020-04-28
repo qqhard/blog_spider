@@ -8,10 +8,10 @@ from redis import StrictRedis
 
 from blog_spider.config import config
 
-no_content_tags = ['script', 'style', 'svg']
+no_content_tags = ['script', 'style', 'svg','br','hr','area','base','img','input','link','meta','param','col']
 content_tags = ["p", "a","pre"]
 
-escape_re = r'([\+\-.~`@#%&=\'\\:;<>,/\(\)])'
+escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
 
 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     spider = client.spider
     erdoc = spider.extend_raw_doc
     rough_data = spider.rough_data
-    for doc in erdoc.find({"incid":{"$gt":start_id}}):
+    for doc in erdoc.find({"incid":{"$gt":5001}}):
         try:
             html = doc['html']
             soup = BeautifulSoup(html, 'html.parser')

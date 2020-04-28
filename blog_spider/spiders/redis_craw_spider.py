@@ -13,6 +13,7 @@ class RedisExtendSpider(RedisCrawlSpider):
     name = "redis_craw_spider"
     custom_settings = {
         "ITEM_PIPELINES":('blog_spider.pipelines.DownloadDomainPipeline',300)
+
     }
 
     rules = (

@@ -1,24 +1,21 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
+from redis import StrictRedis
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from blog_spider.config import config
 import time
-
-client = MongoClient("mongo-server")
-doc: Collection = client['blog']['doc']
-case = doc.find_one({})
-html = case['html']
-
-soup = BeautifulSoup(html, 'html.parser')
 
 
 def extraction_content(soup: BeautifulSoup):
     contents = []
+    body = soup.body
 
     # 根据路径 找到内容
     def dfs_for_contents(content, xpath: str):
         if isinstance(content, str):
-            contents.append((xpath, content.strip()))
+            content = content.strip()
+            content != "" and contents.append((xpath, content.strip()))
             return
         tag: Tag = content
         if tag.name == "script" or tag.name == "svg":
@@ -36,7 +33,7 @@ def extraction_content(soup: BeautifulSoup):
         for tag_content in tag.contents:
             dfs_for_contents(tag_content, xpath)
 
-    dfs_for_contents(soup.contents[1], "")
+    dfs_for_contents(body, "")
 
     # 找到最长内容的 选择路径
     dic = {}
@@ -67,13 +64,48 @@ def extraction_content(soup: BeautifulSoup):
             dfs_for_distance(tag.parent, dis + 1)
 
     for tag in max_tags:
-        dfs_for_distance(tag,0)
-    return soup
+        dfs_for_distance(tag, 0)
+    res = []
 
+    def dfs_for_result(tag, dis):
+        if isinstance(tag, str):
+            if dis >4 :
+                return
+            resc = tag.strip()
+            resc != "" and res.append(resc)
+            return
+        if tag.name in ["script"] :
+            return
+        tag: Tag = tag
+        for c in tag.contents:
+            dfs_for_result(c, tag.min_distance)
 
+    dfs_for_result(body, body.min_distance)
+
+    return "\n".join(res)
 
 
 if __name__ == '__main__':
-    tim = time.time()
-    import nltk
-    nltk.download()
+
+    client = MongoClient(config.spider_mongo_str)
+    redis = StrictRedis(**config.redis_conn)
+    spider = client.spider
+    erdoc = spider.extend_raw_doc
+    rough_data = client.rough_data
+    for doc in erdoc.find():
+        html = doc['html']
+        soup = BeautifulSoup(html, 'html.parser')
+        res = extraction_content(soup)
+        rough_data.insert_one({
+            "incid":doc['incid'],
+            "url" :doc['url'],
+            "domain":doc['domain'],
+            "text":res
+
+        })
+
+    # doc = erdoc.find_one({})
+    # html = doc['html']
+    # soup = BeautifulSoup(html, 'html.parser')
+    # res = extraction_content(soup)
+    # print(res)

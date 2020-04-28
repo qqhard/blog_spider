@@ -26,11 +26,11 @@ DEPTH_LIMIT = 64
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-DUPEFILTER_CLASS = "blog_spider.filter.domain_dupefilter.DomainDupeFilter"
-SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-SCHEDULER_PERSIST = True
-
-SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+# DUPEFILTER_CLASS = "blog_spider.filter.domain_dupefilter.DomainDupeFilter"
+# SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+# SCHEDULER_PERSIST = True
+#
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
 # SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
 # SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
@@ -80,9 +80,9 @@ DOWNLOADER_MIDDLEWARES_BASE ={
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
-    'blog_spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
+    # 'blog_spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
-    'blog_spider.middlewares.redirect.RedirectDomainMiddleware': 600,
+    # 'blog_spider.middlewares.redirect.RedirectDomainMiddleware': 600,
     'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
     'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,

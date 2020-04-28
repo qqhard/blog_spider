@@ -5,6 +5,7 @@ from scrapy.link import Link
 from scrapy.linkextractors import LinkExtractor
 
 
+
 class DomainLinkExtractor(LinkExtractor):
     def __init__(self, *args, **kwargs):
         super(DomainLinkExtractor, self).__init__(*args, **kwargs)

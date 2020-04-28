@@ -25,5 +25,5 @@ def redis_domain_inc(domain):
 def get_domain_inc(domain):
     domain_inc_key = "BLOG_DOMAIN_INC_KEY"
     res = redis.hget(domain_inc_key,domain)
-    return int(res)
+    return 0 if res is None else int(res)
 

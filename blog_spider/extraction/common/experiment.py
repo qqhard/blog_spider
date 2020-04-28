@@ -2,7 +2,7 @@ import re
 import sys
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag
+from bs4.element import Tag,PreformattedString
 from pymongo import MongoClient
 from redis import StrictRedis
 
@@ -26,7 +26,7 @@ def extraction_content(soup: BeautifulSoup):
     def get_new_path(tag: Tag, xpath):
 
         if tag.name in xpath_skip_tags:
-            return ""
+            return xpath
 
         add_xpath = tag.name
         id = tag.attrs.get("id")
@@ -44,6 +44,8 @@ def extraction_content(soup: BeautifulSoup):
     # 根据路径 找到内容
     def dfs_for_contents(content, xpath: str):
         if content is None:
+            return
+        if isinstance(contents,PreformattedString):
             return
         if isinstance(content, str):
             content = content.strip()
@@ -111,6 +113,8 @@ def extraction_content(soup: BeautifulSoup):
 
     def dfs_for_result(tag, dis):
         if tag is None:
+            return
+        if isinstance(contents,PreformattedString):
             return
         if isinstance(tag, str):
             if dis > tag_distance_limit:

@@ -1,16 +1,17 @@
-from pymongo import MongoClient
-from pymongo.collection import Collection
-from redis import StrictRedis
+import re
+import sys
+
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from pymongo import MongoClient
+from redis import StrictRedis
+
 from blog_spider.config import config
-import time
-import re
 
 no_content_tags = ['script', 'style', 'svg']
 content_tags = ["p", "a","pre"]
 
-escape_re = r'([\+\-.~`@#%&=\'\\:;<>,/])'
+escape_re = r'([\+\-.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
 
 
@@ -104,13 +105,20 @@ def extraction_content(soup: BeautifulSoup):
 
 if __name__ == '__main__':
 
+    argv = sys.argv
+    start_id = 0
+    if len(argv) > 1 :
+        try :
+            start_id = int(argv[1])
+        except Exception:
+            pass
 
     client = MongoClient(config.spider_mongo_str)
     redis = StrictRedis(**config.redis_conn)
     spider = client.spider
     erdoc = spider.extend_raw_doc
     rough_data = spider.rough_data
-    for doc in erdoc.find():
+    for doc in erdoc.find({"incid":{"$gt":start_id}}):
         try:
             html = doc['html']
             soup = BeautifulSoup(html, 'html.parser')

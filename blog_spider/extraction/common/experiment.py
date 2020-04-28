@@ -103,7 +103,7 @@ def extraction_content(soup: BeautifulSoup):
 
 
 if __name__ == '__main__':
-    
+
 
     client = MongoClient(config.spider_mongo_str)
     redis = StrictRedis(**config.redis_conn)

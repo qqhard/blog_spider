@@ -36,11 +36,11 @@ def extraction_content(soup: BeautifulSoup):
         add_xpath = tag.name if tag.name not in content_tags else ""
         id = tag.attrs.get("id")
         if id is not None and tag.name != "p":
-            add_xpath = add_xpath + "#" + re.sub(escape_re, escape_replace, id)
+            add_xpath = add_xpath + "#" + str.strip(re.sub(escape_re, escape_replace, id))
         clss = tag.attrs.get("class")
         if clss is not None and tag.name != "p":
             for cls in clss:
-                add_xpath = add_xpath + "." + re.sub(escape_re, escape_replace, cls)
+                add_xpath = add_xpath + "." + str.strip(re.sub(escape_re, escape_replace, cls))
         if add_xpath != "":
             xpath = xpath + ("" if xpath == "" else " ") + add_xpath
         for tag_content in tag.contents:

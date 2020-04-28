@@ -91,18 +91,21 @@ if __name__ == '__main__':
     redis = StrictRedis(**config.redis_conn)
     spider = client.spider
     erdoc = spider.extend_raw_doc
-    rough_data = client.rough_data
+    rough_data = spider.rough_data
     for doc in erdoc.find():
-        html = doc['html']
-        soup = BeautifulSoup(html, 'html.parser')
-        res = extraction_content(soup)
-        rough_data.insert_one({
-            "incid":doc['incid'],
-            "url" :doc['url'],
-            "domain":doc['domain'],
-            "text":res
+        try :
+            html = doc['html']
+            soup = BeautifulSoup(html, 'html.parser')
+            res = extraction_content(soup)
+            rough_data.insert_one({
+                "incid":doc['incid'],
+                "url" :doc['url'],
+                "domain":doc['domain'],
+                "text":res
 
-        })
+                })
+        except Exception as e :
+            print(e)
 
     # doc = erdoc.find_one({})
     # html = doc['html']

@@ -100,7 +100,7 @@ def extraction_content(soup: BeautifulSoup):
 
     dfs_for_result(body, body.min_distance)
 
-    return "\n".join(res)
+    return ["\n".join(res),max_path]
 
 
 if __name__ == '__main__':
@@ -122,12 +122,13 @@ if __name__ == '__main__':
         try:
             html = doc['html']
             soup = BeautifulSoup(html, 'html.parser')
-            res = extraction_content(soup)
+            res,max_path = extraction_content(soup)
             rough_data.insert_one({
                 "incid": doc['incid'],
                 "url": doc['url'],
                 "domain": doc['domain'],
-                "text": res
+                "text": res,
+                "max_path":max_path
 
             })
         except Exception as e:

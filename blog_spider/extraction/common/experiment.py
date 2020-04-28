@@ -4,7 +4,6 @@ import sys
 from bs4 import BeautifulSoup
 from bs4.element import Tag, PreformattedString
 from pymongo import MongoClient
-from redis import StrictRedis
 
 from blog_spider.config import config
 
@@ -171,7 +170,8 @@ def debug():
     client = MongoClient(config.spider_mongo_str)
     spider = client.spider
     erdoc = spider.extend_raw_doc
-    for doc in erdoc.find({"domain": "www.mosq.cn"}):
+    # for doc in erdoc.find({"domain": "www.mosq.cn"}):
+    for doc in erdoc.find({"incid": 310}):
         html = doc['html']
         soup = BeautifulSoup(html)
         title = "" if soup.title is None else soup.title.text
@@ -179,5 +179,5 @@ def debug():
         print(res)
 
 if __name__ == '__main__':
-    debug()
+    run_all()
 

@@ -148,7 +148,7 @@ def run_all():
     for doc in erdoc.find({"incid": {"$gt": start_id}}):
         try:
             html = doc['html']
-            soup:BeautifulSoup = BeautifulSoup(html, 'html.parser')
+            soup:BeautifulSoup = BeautifulSoup(html,"html5lib")
             (res, max_path) = extraction_content(soup)
             title = "" if soup.title is None else soup.title.text
             rough_data.insert_one({
@@ -171,9 +171,9 @@ def debug():
     spider = client.spider
     erdoc = spider.extend_raw_doc
     # for doc in erdoc.find({"domain": "www.mosq.cn"}):
-    for doc in erdoc.find({"incid": 310}):
+    for doc in erdoc.find({"incid": 302}):
         html = doc['html']
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html,'html5lib')
         title = "" if soup.title is None else soup.title.text
         res, max_path = extraction_content(soup)
         print(res)

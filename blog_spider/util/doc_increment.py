@@ -17,3 +17,12 @@ def mongo_row_doc_num():
 def redis_row_doc_num():
     row_num_key = "BLOG_SPIDER_ROW_DOC_INC_ID"
     return redis.incr(row_num_key)
+
+def redis_domain_inc(domain):
+    domain_inc_key = "BLOG_DOMAIN_INC_KEY"
+    return redis.hincrby(domain_inc_key,domain,1)
+
+def get_domain_inc(domain):
+    domain_inc_key = "BLOG_DOMAIN_INC_KEY"
+    return redis.hget(domain_inc_key,domain)
+

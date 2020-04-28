@@ -1,10 +1,10 @@
 from urllib.parse import urlparse, ParseResult
 
-from scrapy.linkextractors import LinkExtractor
-from scrapy.utils.response import get_base_url
 from scrapy.http.response.html import HtmlResponse
 from scrapy.link import Link
-import logging
+from scrapy.linkextractors import LinkExtractor
+from blog_spider.util.doc_increment import get_domain_inc
+from blog_spider import settings
 
 
 class DomainLinkExtractor(LinkExtractor):
@@ -15,6 +15,8 @@ class DomainLinkExtractor(LinkExtractor):
         base_url = response.url
         base_url_parse_result: ParseResult = urlparse(base_url)
         domain = base_url_parse_result.hostname
+        if get_domain_inc(domain) >  settings.MAX_DOMAIN_DOWNLOAD :
+            return []
         links = super(DomainLinkExtractor, self).extract_links(response)
 
         def domain_url_filter(link: Link):

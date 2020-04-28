@@ -38,6 +38,8 @@ REDIS_URL = config.redis_conn_str
 
 REDIS_START_URLS_KEY = "blog:start_urls"
 
+MAX_DOMAIN_DOWNLOAD = 5000
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 

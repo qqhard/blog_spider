@@ -2,11 +2,10 @@ from scrapy_redis.spiders import RedisCrawlSpider
 from blog_spider.linkextractors import DomainLinkExtractor
 from scrapy.spiders import Rule
 from scrapy.http.response.html import HtmlResponse
-from scrapy import Request
 from scrapy.utils.response import get_base_url
 from urllib.parse import urlparse, ParseResult, urljoin
 from blog_spider.items import RawHtmlItem
-from blog_spider.util.DocIncrement import redis_row_doc_num
+from blog_spider.util.doc_increment import redis_row_doc_num,redis_domain_inc
 
 
 class RedisExtendSpider(RedisCrawlSpider):
@@ -26,6 +25,7 @@ class RedisExtendSpider(RedisCrawlSpider):
         baseUrl = get_base_url(response)
         baseUrlParse: ParseResult = urlparse(baseUrl)
         domain = baseUrlParse.netloc
+        redis_domain_inc(domain)
         item = RawHtmlItem()
         item['html'] = response.text
         item["incid"] = redis_row_doc_num()

@@ -8,8 +8,9 @@ from redis import StrictRedis
 
 from blog_spider.config import config
 
-no_content_tags = ['script', 'style', 'svg','br','hr','area','base','img','input','link','meta','param','col','font','center']
-content_tags = ["p", "a","pre",'span','b']
+no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
+                   'font', 'center']
+content_tags = ["p", "a", "pre", 'span', 'b']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
@@ -19,7 +20,7 @@ def extraction_content(soup: BeautifulSoup):
     contents = []
     body = soup.body
     if body is None:
-        return ""
+        return ("", "")
 
     # 根据路径 找到内容
     def dfs_for_contents(content, xpath: str):
@@ -35,11 +36,11 @@ def extraction_content(soup: BeautifulSoup):
         add_xpath = tag.name if tag.name not in content_tags else ""
         id = tag.attrs.get("id")
         if id is not None and tag.name != "p":
-            add_xpath = add_xpath + "#" + re.sub(escape_re,escape_replace,id)
+            add_xpath = add_xpath + "#" + re.sub(escape_re, escape_replace, id)
         clss = tag.attrs.get("class")
         if clss is not None and tag.name != "p":
             for cls in clss:
-                add_xpath = add_xpath + "." + re.sub(escape_re,escape_replace,cls)
+                add_xpath = add_xpath + "." + re.sub(escape_re, escape_replace, cls)
         if add_xpath != "":
             xpath = xpath + ("" if xpath == "" else " ") + add_xpath
         for tag_content in tag.contents:
@@ -47,7 +48,7 @@ def extraction_content(soup: BeautifulSoup):
 
     dfs_for_contents(body, "")
     if not contents:
-        return ""
+        return ("","")
 
     # 找到最长内容的 选择路径
     dic = {}
@@ -100,15 +101,15 @@ def extraction_content(soup: BeautifulSoup):
 
     dfs_for_result(body, body.min_distance)
 
-    return ["\n".join(res),max_path]
+    return ("\n".join(res), max_path)
 
 
 if __name__ == '__main__':
 
     argv = sys.argv
     start_id = 0
-    if len(argv) > 1 :
-        try :
+    if len(argv) > 1:
+        try:
             start_id = int(argv[1])
         except Exception:
             pass
@@ -118,17 +119,17 @@ if __name__ == '__main__':
     spider = client.spider
     erdoc = spider.extend_raw_doc
     rough_data = spider.rough_data
-    for doc in erdoc.find({"incid":{"$gt":start_id}}):
+    for doc in erdoc.find({"incid": {"$gt": start_id}}):
         try:
             html = doc['html']
             soup = BeautifulSoup(html, 'html.parser')
-            res,max_path = extraction_content(soup)
+            (res, max_path) = extraction_content(soup)
             rough_data.insert_one({
                 "incid": doc['incid'],
                 "url": doc['url'],
                 "domain": doc['domain'],
                 "text": res,
-                "max_path":max_path
+                "max_path": max_path
 
             })
         except Exception as e:

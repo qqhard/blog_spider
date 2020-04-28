@@ -8,8 +8,8 @@ from redis import StrictRedis
 
 from blog_spider.config import config
 
-no_content_tags = ['script', 'style', 'svg','br','hr','area','base','img','input','link','meta','param','col']
-content_tags = ["p", "a","pre"]
+no_content_tags = ['script', 'style', 'svg','br','hr','area','base','img','input','link','meta','param','col','font','center']
+content_tags = ["p", "a","pre",'span','b']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'

@@ -1,5 +1,5 @@
 
-from blog_spider.config.CommonConfig import __CommonConfig
+from blog_spider.config.common_config import __CommonConfig
 
 
 class __LocalConfig(__CommonConfig) :

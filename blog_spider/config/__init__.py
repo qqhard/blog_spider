@@ -1,4 +1,4 @@
 
 
 
-from blog_spider.config.LocalConfig import config
+from blog_spider.config.local_config import config

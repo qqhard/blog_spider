@@ -9,7 +9,7 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-from blog_spider.config.LocalConfig import config
+from blog_spider.config.local_config import config
 import datetime
 import logging
 

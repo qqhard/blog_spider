@@ -2,7 +2,7 @@ import re
 import sys
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag,PreformattedString
+from bs4.element import Tag, PreformattedString
 from pymongo import MongoClient
 from redis import StrictRedis
 
@@ -10,7 +10,7 @@ from blog_spider.config import config
 
 no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
                    'font', 'center']
-xpath_skip_tags = ["body", "p", "a", "pre", 'span', 'b', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6','tr','th','td']
+xpath_skip_tags = ["body", "p", "a", "pre", 'span', 'b', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'th', 'td']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
@@ -21,7 +21,7 @@ def extraction_content(soup: BeautifulSoup):
     contents = []
     body = soup.body
     if body is None:
-        return ("", "")
+        return "", ""
 
     def get_new_path(tag: Tag, xpath):
 
@@ -45,7 +45,7 @@ def extraction_content(soup: BeautifulSoup):
     def dfs_for_contents(content, xpath: str):
         if content is None:
             return
-        if isinstance(contents,PreformattedString):
+        if isinstance(content, PreformattedString):
             return
         if isinstance(content, str):
             content = content.strip()
@@ -60,7 +60,7 @@ def extraction_content(soup: BeautifulSoup):
 
     dfs_for_contents(body, "")
     if not contents:
-        return ("", "")
+        return "", ""
 
     # 找到最长内容的 选择路径
     dic = {}
@@ -114,7 +114,7 @@ def extraction_content(soup: BeautifulSoup):
     def dfs_for_result(tag, dis):
         if tag is None:
             return
-        if isinstance(contents,PreformattedString):
+        if isinstance(tag, PreformattedString):
             return
         if isinstance(tag, str):
             if dis > tag_distance_limit:
@@ -130,11 +130,10 @@ def extraction_content(soup: BeautifulSoup):
 
     dfs_for_result(body, body.min_distance)
 
-    return ("\n".join(res), max_path)
+    return "\n".join(res), max_path
 
 
-if __name__ == '__main__':
-
+def run_all():
     argv = sys.argv
     start_id = 0
     if len(argv) > 1:
@@ -144,21 +143,22 @@ if __name__ == '__main__':
             pass
 
     client = MongoClient(config.spider_mongo_str)
-    redis = StrictRedis(**config.redis_conn)
     spider = client.spider
     erdoc = spider.extend_raw_doc
     rough_data = spider.rough_data
     for doc in erdoc.find({"incid": {"$gt": start_id}}):
         try:
             html = doc['html']
-            soup = BeautifulSoup(html, 'html.parser')
+            soup:BeautifulSoup = BeautifulSoup(html, 'html.parser')
             (res, max_path) = extraction_content(soup)
+            title = "" if soup.title is None else soup.title.text
             rough_data.insert_one({
                 "incid": doc['incid'],
                 "url": doc['url'],
                 "domain": doc['domain'],
+                "title":title,
+                "max_path": max_path,
                 "text": res,
-                "max_path": max_path
 
             })
         except Exception as e:
@@ -166,8 +166,18 @@ if __name__ == '__main__':
             print(e)
             raise e
 
-    # doc = erdoc.find_one({})
-    # html = doc['html']
-    # soup = BeautifulSoup(html, 'html.parser')
-    # res = extraction_content(soup)
-    # print(res)
+
+def debug():
+    client = MongoClient(config.spider_mongo_str)
+    spider = client.spider
+    erdoc = spider.extend_raw_doc
+    for doc in erdoc.find({"domain": "www.mosq.cn"}):
+        html = doc['html']
+        soup = BeautifulSoup(html)
+        title = "" if soup.title is None else soup.title.text
+        res, max_path = extraction_content(soup)
+        print(res)
+
+if __name__ == '__main__':
+    debug()
+

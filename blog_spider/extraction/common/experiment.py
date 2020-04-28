@@ -10,10 +10,11 @@ from blog_spider.config import config
 
 no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
                    'font', 'center']
-content_tags = ["p", "a", "pre", 'span', 'b']
+xpath_skip_tags = ["body", "p", "a", "pre", 'span', 'b', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6','tr','th','td']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
+tag_distance_limit = 4
 
 
 def extraction_content(soup: BeautifulSoup):
@@ -23,14 +24,19 @@ def extraction_content(soup: BeautifulSoup):
         return ("", "")
 
     def get_new_path(tag: Tag, xpath):
-        add_xpath = tag.name if tag.name not in content_tags else ""
+
+        if tag.name in xpath_skip_tags:
+            return ""
+
+        add_xpath = tag.name
         id = tag.attrs.get("id")
-        if id is not None and tag.name != "p":
-            add_xpath = add_xpath + "#" + str.strip(re.sub(escape_re, escape_replace, id))
+        # if id is not None and tag.name != "p":
+        #     add_xpath = add_xpath + "#" + str.strip(re.sub(escape_re, escape_replace, id))
         clss = tag.attrs.get("class")
         if clss is not None and tag.name != "p":
             for cls in clss:
                 add_xpath = add_xpath + "." + str.strip(re.sub(escape_re, escape_replace, cls))
+                break
         if add_xpath != "":
             xpath = xpath + ("" if xpath == "" else " ") + add_xpath
         return xpath
@@ -72,16 +78,14 @@ def extraction_content(soup: BeautifulSoup):
         if content is None or isinstance(content, str):
             return
         tag: Tag = content
-        new_xpath = get_new_path(tag,xpath)
-        if new_xpath == max_path :
+        new_xpath = get_new_path(tag, xpath)
+        if new_xpath == max_path:
             max_tags.append(tag)
             return
         for c in tag.contents:
-            dfs_for_max_tags(c,new_xpath)
+            dfs_for_max_tags(c, new_xpath)
 
-    dfs_for_max_tags(body,"")
-
-
+    dfs_for_max_tags(body, "")
 
     # 标定每个内容离最选择路径的距离
 
@@ -92,6 +96,8 @@ def extraction_content(soup: BeautifulSoup):
             return
         if hasattr(tag, "min_distance") and tag.min_distance is not None and tag.min_distance <= dis:
             return
+        if tag.name in xpath_skip_tags:
+            dis = max(0, dis - 1)
         tag.min_distance = dis
 
         for content in tag.contents:
@@ -107,7 +113,7 @@ def extraction_content(soup: BeautifulSoup):
         if tag is None:
             return
         if isinstance(tag, str):
-            if dis > 6:
+            if dis > tag_distance_limit:
                 return
             resc = tag.strip()
             resc != "" and res.append(resc)

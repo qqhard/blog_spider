@@ -22,6 +22,19 @@ def extraction_content(soup: BeautifulSoup):
     if body is None:
         return ("", "")
 
+    def get_new_path(tag: Tag, xpath):
+        add_xpath = tag.name if tag.name not in content_tags else ""
+        id = tag.attrs.get("id")
+        if id is not None and tag.name != "p":
+            add_xpath = add_xpath + "#" + str.strip(re.sub(escape_re, escape_replace, id))
+        clss = tag.attrs.get("class")
+        if clss is not None and tag.name != "p":
+            for cls in clss:
+                add_xpath = add_xpath + "." + str.strip(re.sub(escape_re, escape_replace, cls))
+        if add_xpath != "":
+            xpath = xpath + ("" if xpath == "" else " ") + add_xpath
+        return xpath
+
     # 根据路径 找到内容
     def dfs_for_contents(content, xpath: str):
         if content is None:
@@ -33,22 +46,13 @@ def extraction_content(soup: BeautifulSoup):
         tag: Tag = content
         if tag.name in no_content_tags:
             return
-        add_xpath = tag.name if tag.name not in content_tags else ""
-        id = tag.attrs.get("id")
-        if id is not None and tag.name != "p":
-            add_xpath = add_xpath + "#" + str.strip(re.sub(escape_re, escape_replace, id))
-        clss = tag.attrs.get("class")
-        if clss is not None and tag.name != "p":
-            for cls in clss:
-                add_xpath = add_xpath + "." + str.strip(re.sub(escape_re, escape_replace, cls))
-        if add_xpath != "":
-            xpath = xpath + ("" if xpath == "" else " ") + add_xpath
+        nxpath = get_new_path(tag, xpath)
         for tag_content in tag.contents:
-            dfs_for_contents(tag_content, xpath)
+            dfs_for_contents(tag_content, nxpath)
 
     dfs_for_contents(body, "")
     if not contents:
-        return ("","")
+        return ("", "")
 
     # 找到最长内容的 选择路径
     dic = {}
@@ -62,7 +66,22 @@ def extraction_content(soup: BeautifulSoup):
         if len(dic[tup[0]]) > max_len:
             max_len = len(dic[tup[0]])
             max_path = tup[0]
-    max_tags = soup.select(max_path)
+    max_tags = []
+
+    def dfs_for_max_tags(content, xpath):
+        if content is None or isinstance(content, str):
+            return
+        tag: Tag = content
+        new_xpath = get_new_path(tag,xpath)
+        if new_xpath == max_path :
+            max_tags.append(tag)
+            return
+        for c in tag.contents:
+            dfs_for_max_tags(c,new_xpath)
+
+    dfs_for_max_tags(body,"")
+
+
 
     # 标定每个内容离最选择路径的距离
 

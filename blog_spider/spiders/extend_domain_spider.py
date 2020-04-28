@@ -3,12 +3,13 @@ import scrapy
 from scrapy.utils.response import get_base_url
 from scrapy import Request
 from urllib.parse import urljoin
-from blog_spider.items import RawHtmlItem
-from blog_spider.config.LocalConfig import config
+from blog_spider.config import config
+from blog_spider.items import DomainLinkItem
 import pymongo
 import re
 
-domain_pa = re.compile(r"https?://(.*?)[\/\?\#]")
+domain_pa = re.compile(r'https?://[\w.]+?\.[a-z]+/?$')
+domain_pa2 = re.compile(r'https?://([\w.]+?)/?$')
 
 
 class ExtendDomainSpider(scrapy.Spider):
@@ -20,7 +21,7 @@ class ExtendDomainSpider(scrapy.Spider):
         # collec_new_domain = client.spider.new_domain
         allowed_domains = []
         start_urls = []
-        for o in collec_domain.find({'status':1}):
+        for o in collec_domain.find({'status': 1, 'title': {'$ne': None}}):
             domain = o.get('domain')
             allowed_domains.append(domain)
             start_urls.append(o.get('url'))
@@ -30,17 +31,15 @@ class ExtendDomainSpider(scrapy.Spider):
     def parse(self, response):
         base_url = get_base_url(response)
         hrefs = response.xpath('//a/@href').extract()
-        domain = domain_pa.match(base_url).group(1)
         for url in hrefs:
             full_url = urljoin(base_url, url)
-            domain_res = domain_pa.match(full_url)
-            if domain_res is not None and domain_res.group(1) in self.allowed_domains:
-                yield Request(full_url, self.parse)
+            yield Request(full_url, self.parse)
 
-        url = urljoin(base_url, response.url)
-        item = RawHtmlItem()
-        item['url'] = url
-        item['html'] = response.text
-        item['domain'] = domain
-
-        yield item
+            m = domain_pa.match(url)
+            if m is not None:
+                m = domain_pa2.match(url)
+                domain = m.group(1)
+                item = DomainLinkItem()
+                item['url'] = url
+                item['domain'] = domain
+                yield item

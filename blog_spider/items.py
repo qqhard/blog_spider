@@ -24,3 +24,7 @@ class RawHtmlItem(scrapy.Item):
     html = Field()
     domain = Field()
     incid = Field()
+
+class DomainLinkItem(scrapy.Item):
+    url = scrapy.Field()
+    domain = scrapy.Field()

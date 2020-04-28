@@ -1,6 +1,6 @@
 from pymongo import MongoClient, ReturnDocument
 from pymongo.collection import Collection
-from blog_spider.config.LocalConfig import config
+from blog_spider.config import config
 from redis import StrictRedis
 
 client = MongoClient(config.spider_mongo_str)

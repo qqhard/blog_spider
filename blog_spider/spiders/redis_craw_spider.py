@@ -11,6 +11,9 @@ from blog_spider.util.doc_increment import redis_row_doc_num
 class RedisExtendSpider(RedisCrawlSpider):
     redis_key = "blog:start_urls"
     name = "redis_craw_spider"
+    custom_settings = {
+        "ITEM_PIPELINES":('blog_spider.pipelines.DownloadDomainPipeline',300)
+    }
 
     rules = (
         Rule(DomainLinkExtractor(), callback='parse_page', follow=True),

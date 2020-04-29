@@ -59,9 +59,15 @@ class RedisExtendSpider(RedisCrawlSpider):
         "DEFAULT_REQUEST_HEADERS": {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         },
+        "RETRY_TIMES":8,
         "DEPTH_LIMIT": 64,
         "LOG_LEVEL": logging.WARNING,
-        "LOG_FILE": log_file_path
+        "LOG_FILE": log_file_path,
+        "DOWNLOAD_DELAY": 1,
+        "DOWNLOAD_MAXSIZE":102400, # 10M
+        "DOWNLOAD_WARNSIZE":5120, # 10M
+        "CONCURRENT_REQUESTS":24,
+
     }
 
     rules = (

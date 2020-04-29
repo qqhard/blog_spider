@@ -65,8 +65,8 @@ class RedisExtendSpider(RedisCrawlSpider):
         "DEPTH_LIMIT": 64,
         "LOG_LEVEL": logging.WARNING,
         "LOG_FILE": log_file_path,
-        "DOWNLOAD_MAXSIZE":102400, # 10M
-        "DOWNLOAD_WARNSIZE":51200, # 10M
+        "DOWNLOAD_MAXSIZE":10485760, # 10M
+        "DOWNLOAD_WARNSIZE":5242880, # 10M
         "CONCURRENT_REQUESTS":72,
 
     }

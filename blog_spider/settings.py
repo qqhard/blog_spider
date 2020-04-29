@@ -38,8 +38,6 @@ REDIS_URL = config.redis_conn_str
 
 REDIS_START_URLS_KEY = "blog:start_urls"
 
-MAX_DOMAIN_DOWNLOAD = 5000
-
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 
@@ -72,22 +70,6 @@ MAX_DOMAIN_DOWNLOAD = 5000
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 
-DOWNLOADER_MIDDLEWARES_BASE ={
-    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
-    'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
-    'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
-    'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
-    'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
-    # 'blog_spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
-    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
-    # 'blog_spider.middlewares.redirect.RedirectDomainMiddleware': 600,
-    'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
-    'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,
-    'scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
-}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -124,7 +106,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 today = datetime.datetime.now()
-log_file_path = "/log/blog_spider/log-{}-{}-{}.log".format(today.year, today.month, today.day)
+log_file_path = "/var/log/blog_spider/log-{}-{}-{}.log".format(today.year, today.month, today.day)
 
 LOG_LEVEL = logging.WARNING
 LOG_FILE = log_file_path

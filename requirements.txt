@@ -1,3 +1,5 @@
 scrapy
 bs4
 pymongo
+elasticsearch
+scrapy_redis

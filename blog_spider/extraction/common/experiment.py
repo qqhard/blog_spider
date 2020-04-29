@@ -9,11 +9,11 @@ from blog_spider.config import config
 
 no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
                    'font', 'center']
-xpath_skip_tags = ["body", "p", "a", "pre", 'span', 'b', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'th', 'td']
+xpath_skip_tags = ["body", "p", "a", "pre", 'span', 'b', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'th', 'td','tbody','thead']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
-tag_distance_limit = 4
+tag_distance_limit = 3
 
 
 def extraction_content(soup: BeautifulSoup):

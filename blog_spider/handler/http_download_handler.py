@@ -26,6 +26,7 @@ class ForceAcceptScrapyAgent(ScrapyAgent):
         accept_type_list = accept_type.split(";")[0].split(",")
         content_type = content_type.split(";")[0].strip()
         d = request.response_defer if hasattr(request, "response_defer") else None
+        accept_type_list.append("")
         if d is not None and not content_type in accept_type_list:
             d.cancel()
             txresponse.code = 406

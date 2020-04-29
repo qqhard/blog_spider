@@ -33,8 +33,8 @@ class TestScrapySpider(scrapy.Spider):
 
     def __init__(self):
         super(TestScrapySpider, self).__init__()
-        self.start_urls=["https://mirrors.aliyun.com/epel/8/Everything/x86_64/Packages/z/zabbix40-web-mysql-4.0.17-1.el8.noarch.rpm"]
-        # self.start_urls=["https://rzfyu.com/"]
+        # self.start_urls=["https://mirrors.aliyun.com/epel/8/Everything/x86_64/Packages/z/zabbix40-web-mysql-4.0.17-1.el8.noarch.rpm"]
+        self.start_urls=["http://www.susubaby.cn"]
         pass
 
     def parse(self, response):

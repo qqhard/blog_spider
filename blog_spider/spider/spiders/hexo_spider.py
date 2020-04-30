@@ -3,7 +3,7 @@ import scrapy
 from scrapy.utils.response import get_base_url
 from scrapy import Request
 from urllib.parse import urljoin
-from blog_spider.items import BlogSpiderItem
+from blog_spider.spider.items import BlogSpiderItem
 
 
 class HexoSpiderSpider(scrapy.Spider):

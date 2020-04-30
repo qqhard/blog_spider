@@ -15,8 +15,8 @@ import logging
 
 BOT_NAME = 'blog_spider'
 
-SPIDER_MODULES = ['blog_spider.spiders']
-NEWSPIDER_MODULE = 'blog_spider.spiders'
+SPIDER_MODULES = ['blog_spider.spider.spiders']
+NEWSPIDER_MODULE = 'blog_spider.spider.spiders'
 
 DEPTH_LIMIT = 64
 
@@ -81,7 +81,7 @@ REDIS_START_URLS_KEY = "blog:start_urls"
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # 'blog_spider.pipelines.BlogSpiderPipeline': 300,
-    'blog_spider.pipelines.ExtendDomainPipeline': 301,
+    'blog_spider.spider.pipelines.ExtendDomainPipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

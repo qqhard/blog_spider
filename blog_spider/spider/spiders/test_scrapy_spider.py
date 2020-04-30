@@ -12,12 +12,12 @@ class TestScrapySpider(scrapy.Spider):
     custom_settings = {
         "DOWNLOADER_MIDDLEWARES_BASE": {
             'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
-            'blog_spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
-            'blog_spider.middlewares.redirect.RedirectDomainMiddleware': 600,
+            'blog_spider.spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
+            'blog_spider.spider.middlewares.redirect.RedirectDomainMiddleware': 600,
         },
         "DOWNLOAD_HANDLERS_BASE":{
-            'http': 'blog_spider.handler.ForceAcceptHTTPDownloadHandler',
-            'https': 'blog_spider.handler.ForceAcceptHTTPDownloadHandler',
+            'http': 'blog_spider.spider.handler.ForceAcceptHTTPDownloadHandler',
+            'https': 'blog_spider.spider.handler.ForceAcceptHTTPDownloadHandler',
             'file': 'scrapy.core.downloader.handlers.file.FileDownloadHandler',
             's3': 'scrapy.core.downloader.handlers.s3.S3DownloadHandler',
             'ftp': 'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler'

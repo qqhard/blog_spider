@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy.utils.response import get_base_url
-from scrapy import Request
-from urllib.parse import urljoin
-from blog_spider.items import RawHtmlItem
 import pymongo
 import re
 

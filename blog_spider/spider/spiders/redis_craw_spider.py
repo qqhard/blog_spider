@@ -1,11 +1,11 @@
 from scrapy_redis.spiders import RedisCrawlSpider
-from blog_spider.linkextractors import DomainLinkExtractor
+from blog_spider.spider.linkextractors import DomainLinkExtractor
 from scrapy.spiders import Rule
 from blog_spider.config import config
 from scrapy.http.response.html import HtmlResponse
 from scrapy.utils.response import get_base_url
 from urllib.parse import urlparse, ParseResult, urljoin
-from blog_spider.items import RawHtmlItem
+from blog_spider.spider.items import RawHtmlItem
 from blog_spider.util.doc_increment import redis_row_doc_num
 import logging
 import datetime
@@ -23,8 +23,8 @@ class RedisExtendSpider(RedisCrawlSpider):
             'blog_spider.pipelines.DownloadDomainPipeline':300
         },
         # 使用scrapy_redis 的queue  dupefilter  scheduler and persist
-        "SCHEDULER_QUEUE_CLASS": "blog_spider.queue.RandomQueue",
-        "DUPEFILTER_CLASS": "blog_spider.filter.domain_dupefilter.DomainDupeFilter",
+        "SCHEDULER_QUEUE_CLASS": "blog_spider.spider.queue.RandomQueue",
+        "DUPEFILTER_CLASS": "blog_spider.spider.filter.domain_dupefilter.DomainDupeFilter",
         "SCHEDULER": "scrapy_redis.scheduler.Scheduler",
         "SCHEDULER_PERSIST": True,
 
@@ -37,9 +37,9 @@ class RedisExtendSpider(RedisCrawlSpider):
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
             'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
             'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
-            'blog_spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
+            'blog_spider.spider.middlewares.redirect.MetaRefreshDomainMiddleware': 580,
             'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
-            'blog_spider.middlewares.redirect.RedirectDomainMiddleware': 600,
+            'blog_spider.spider.middlewares.redirect.RedirectDomainMiddleware': 600,
             'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
             'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
             'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,
@@ -47,8 +47,8 @@ class RedisExtendSpider(RedisCrawlSpider):
         },
         # http downloader , 限定只下载网页
         "DOWNLOAD_HANDLERS_BASE": {
-            'http': 'blog_spider.handler.ForceAcceptHTTPDownloadHandler',
-            'https': 'blog_spider.handler.ForceAcceptHTTPDownloadHandler',
+            'http': 'blog_spider.spider.handler.ForceAcceptHTTPDownloadHandler',
+            'https': 'blog_spider.spider.handler.ForceAcceptHTTPDownloadHandler',
         },
 
         "REDIS_URL": config.redis_conn_str,

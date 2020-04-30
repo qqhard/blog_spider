@@ -67,7 +67,8 @@ class RedisExtendSpider(RedisCrawlSpider):
         "LOG_FILE": log_file_path,
         "DOWNLOAD_MAXSIZE":10485760, # 10M
         "DOWNLOAD_WARNSIZE":5242880, # 10M
-        "CONCURRENT_REQUESTS":72,
+        "CONCURRENT_REQUESTS":24,
+        "REDIS_START_URLS_BATCH_SIZE":72
 
     }
 

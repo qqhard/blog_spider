@@ -121,6 +121,5 @@ def process_all_domain():
 
 
 if __name__ == '__main__':
-    test_domain = "mkblog.cn"
-    process_domain(test_domain)
+    process_all_domain()
     pass

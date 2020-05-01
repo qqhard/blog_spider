@@ -60,7 +60,7 @@ class RedisExtendSpider(RedisCrawlSpider):
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         },
         "RETRY_TIMES":8,
-        "DOWNLOAD_DELAY":1,
+        "DOWNLOAD_DELAY":0.25,
         "RANDOMIZE_DOWNLOAD_DELAY":True,
         "DEPTH_LIMIT": 64,
         "LOG_LEVEL": logging.WARNING,

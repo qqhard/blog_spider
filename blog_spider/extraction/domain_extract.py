@@ -87,6 +87,8 @@ def get_condense_html_tree(html, *args, **kwargs):
                 ctree.append({path})
             else:
                 ctree[i].add(path)
+    for i , s in enumerate(ctree):
+        ctree[i] = list(s)
     return ctree
 
 

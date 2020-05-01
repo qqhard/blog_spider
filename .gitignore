@@ -1,5 +1,7 @@
-*/__pycache__
 nohup.out
 .idea
 test
 blog_spider/config/local_config.py
+*/__pycache__
+*.pyc
+*.pyo

@@ -107,7 +107,7 @@ def process_domain(domain: str):
                 'condense_data': r,
             }}}, upsert=True)
 
-    condense_raw.update_one({"domain": domain}, {"domain_dict": indexer.get_dic()}, upsert=True)
+    condense_raw.update_one({"domain": domain}, {"$set":{"domain_dict": indexer.get_dic()}}, upsert=True)
     del indexer
 
 def process_all_domain():

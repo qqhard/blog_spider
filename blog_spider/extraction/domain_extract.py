@@ -98,7 +98,8 @@ def process_domain(domain: str):
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
     condense_raw: Collection = client.spider.condense_raw
-    for doc in coll.find({"domain": domain}):
+    domain_list = list(coll.find({"domain": domain}))
+    for doc in domain:
         r = get_condense_html_tree(doc['html'], doc['url'], doc['domain'])
         condense_raw.update_one({"domain": domain}, {"$push": {
             "items": {

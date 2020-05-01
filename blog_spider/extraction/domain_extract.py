@@ -99,7 +99,7 @@ def process_domain(domain: str):
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
     condense_raw: Collection = client.spider.condense_raw
     domain_list = list(coll.find({"domain": domain}))
-    for doc in domain:
+    for doc in domain_list:
         r = get_condense_html_tree(doc['html'], doc['url'], doc['domain'])
         condense_raw.update_one({"domain": domain}, {"$push": {
             "items": {

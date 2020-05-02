@@ -7,6 +7,8 @@ from pymongo.collection import Collection
 from blog_spider.config import config
 import random
 from functools import reduce
+import pandas as pd
+from blog_spider.util.list import resize
 
 sample_num = 500
 
@@ -47,8 +49,8 @@ def cal_distance(x, y):
     return dis
 
 
-def get_threshold_distance(domain_data):
-    l = len(domain_data['items'])
+def get_threshold_distance(vectors):
+    l = len(vectors)
     if l < 2:
         return 0
     sum = 0
@@ -58,7 +60,7 @@ def get_threshold_distance(domain_data):
         ib = ia
         while ib == ia:
             ib = random.randint(0, l - 1)
-        dis = cal_distance(domain_data['items'][ia]['condense_data'], domain_data['items'][ib]['condense_data'])
+        dis = cal_distance(vectors[ia],vectors[ib])
         sum += dis
         diss.append(dis)
     diss.sort()
@@ -74,37 +76,39 @@ def process_domain_test(domain_data):
         print(i, dis)
 
 
-def process_domain(domain_data):
-    threshold_distance = get_threshold_distance(domain_data)
-    clusters = []
-    for item in domain_data['items']:
-        nc_flag = True
-        for cluster in clusters:
-            for itemx in cluster:
-                dis = cal_distance(item['condense_data'], itemx['condense_data'])
-                if dis < threshold_distance:
-                    cluster.append(item)
-                    nc_flag = False
-                break
-            if not nc_flag:
-                break
-        if nc_flag:
-            clusters.append([item])
-    for cluster in clusters:
-        for item in cluster:
-            print(item['url'], item['incid'])
-            print(item['condense_data'])
-            print('.' * 50)
 
-        print("-" * 160, "\n" * 3)
-    return clusters
-
-
-if __name__ == '__main__':
-    domain = "blog.iknet.top"
+def process_domain(domain):
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.vector_domain
+    vectors = []
+    identifys= []
+    for vdata in coll.find({"domain":domain}):
+        vectors.append(vdata['condense_data'])
+        identifys.append((vdata['url'],vdata['incid']))
+    threshold = get_threshold_distance(vectors)
+    clusters = []
+    for i,vector in enumerate(vectors) :
+        nc = True
+        for cluster in clusters:
+            for identify,svector in cluster :
+                if cal_distance(vector,svector) < threshold :
+                    nc = False
+                    cluster.append((identifys[i],vector))
+                break
+        if nc is True :
+            clusters.append([(identifys[i],vector)])
+    clusters = list(map(lambda x : list(map(lambda y:y[0],x)),clusters))
+    return clusters
 
-    data = coll.find_one({"domain": domain})
-    # data = coll.find_one()
-    process_domain(domain_data=data)
+def process_all():
+    client = MongoClient(config.spider_mongo_str)
+    vdata : Collection = client.spider.vector_domain
+    coll_cluster :Collection = client.domain_cluster
+    domains = list(vdata.aggregate([{'$group': {"_id": "$domain"}}]))
+    for data in domains :
+        domain = data['_id']
+        res = process_domain(domain)
+        coll_cluster.insert_one({"domain":domain,"cluster":res})
+
+if __name__ == '__main__':
+    process_all()

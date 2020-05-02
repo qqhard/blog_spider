@@ -84,10 +84,14 @@ def get_condense_html_tree(html, *args, **kwargs):
     for xpath, content in contents:
         for i, path in enumerate(xpath):
             idx = indexer.get_index(path)
-            while idx >= len(ctree):
-                ctree.append(0)
-            ctree[idx] += i + 1
-    return ctree
+            if i == len(ctree) :
+                ctree.append(set())
+            ctree[i].add(idx)
+    vector = [0] * len(indexer)
+    for deep,i in enumerate(ctree):
+        for idx in i :
+            vector[idx] += deep + 1
+    return vector
 
 
 def process_domain(domain: str):

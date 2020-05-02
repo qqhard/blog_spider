@@ -28,6 +28,9 @@ def process_domain(domain):
         text = soup.text
         words = re.split("\W",text)
         for word in words :
+            word = word.strip()
+            if word == "" :
+                continue
             h = md5hash(word)
             if dic.get(h) is None :
                 dic[h] = 1
@@ -39,15 +42,12 @@ def process_domain(domain):
 def process_all():
     client = MongoClient(config.spider_mongo_str)
     coll :Collection = client.spider.extend_raw_doc_2020_04_29
-    domains = list[coll.aggregate([{'$group': {"_id": "$domain"}}])]
+    domains = list(coll.aggregate([{'$group': {"_id": "$domain"}}]))
     domain_sentence_map : Collection = client.spider.domain_sentence_map
     for data in domains :
         domain = data['_id']
         res = process_domain(domain)
         domain_sentence_map.insert_one({"domain":domain,"map":res})
-
-
-
 
 if __name__ == '__main__':
     process_all()

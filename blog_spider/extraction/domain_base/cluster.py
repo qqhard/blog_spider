@@ -8,8 +8,6 @@ from blog_spider.config import config
 import random
 from functools import reduce
 
-decline = 0.7
-
 sample_num = 500
 
 
@@ -39,17 +37,13 @@ def cal_distance(x, y):
     ly = len(y)
     lm = max(lx, ly)
     dis = 0
-    dec = 1
     for i in range(0, lm - 1):
         if i >= lx:
-            dis += dec
+            dis += y[i]
         elif i >= ly:
-            dis += dec
+            dis += x[i]
         else:
-            sx = set(x[i])
-            sy = set(y[i])
-            dis += dec * (len(sx ^ sy)/len(sx | sy))
-        dec *= decline
+            dis += abs(y[i] - x[i])
     return dis
 
 
@@ -68,12 +62,11 @@ def get_threshold_distance(domain_data):
         sum += dis
         diss.append(dis)
     diss.sort()
-    threshold = reduce(lambda x, y: x + y, diss[0:300], 0) / 300
+    threshold = reduce(lambda x, y: x + y, diss[0:500], 0) / 500
     return threshold
 
 
 def process_domain_test(domain_data):
-    pre_process(domain_data)
     threshold, diss = get_threshold_distance(domain_data)
     print(threshold)
     diss.sort()
@@ -82,7 +75,6 @@ def process_domain_test(domain_data):
 
 
 def process_domain(domain_data):
-    pre_process(domain_data)
     threshold_distance = get_threshold_distance(domain_data)
     clusters = []
     for item in domain_data['items']:
@@ -109,9 +101,9 @@ def process_domain(domain_data):
 
 
 if __name__ == '__main__':
-    domain = "www.mosq.cn"
+    domain = "blog.iknet.top"
     client = MongoClient(config.spider_mongo_str)
-    coll: Collection = client.spider.condense_raw
+    coll: Collection = client.spider.vector_domain
 
     data = coll.find_one({"domain": domain})
     # data = coll.find_one()

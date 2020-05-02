@@ -84,12 +84,12 @@ def get_condense_html_tree(html, *args, **kwargs):
     for xpath, content in contents:
         for i, path in enumerate(xpath):
             idx = indexer.get_index(path)
-            if i == len(ctree) :
+            if i == len(ctree):
                 ctree.append(set())
             ctree[i].add(idx)
     vector = [0] * len(indexer)
-    for deep,i in enumerate(ctree):
-        for idx in i :
+    for deep, i in enumerate(ctree):
+        for idx in i:
             vector[idx] += deep + 1
     return vector
 
@@ -100,18 +100,19 @@ def process_domain(domain: str):
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
     condense_raw: Collection = client.spider.vector_domain
+    craw_metadata = client.spider.vector_domain_metadata
     for doc in coll.find({"domain": domain}):
         r = get_condense_html_tree(doc['html'], doc['url'], doc['domain'])
-        condense_raw.update_one({"domain": domain}, {"$push": {
-            "items": {
-                'url': doc['url'],
-                'incid': doc['incid'],
-                'condense_data': r,
-            }}}, upsert=True)
+        condense_raw.insert_one({
+            'url': doc['url'],
+            'domain':domain,
+            'incid': doc['incid'],
+            'condense_data': r,
+        })
 
-    condense_raw.update_one({"domain": domain}, {"$set": {
+    craw_metadata.update_one({"domain": domain}, {"$set": {
         "domain_dict": indexer.get_dic(),
-        "domain_dimension":len(indexer)
+        "domain_dimension": len(indexer)
     }}, upsert=True)
     del indexer
 

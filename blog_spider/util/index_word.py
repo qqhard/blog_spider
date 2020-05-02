@@ -6,6 +6,8 @@ import random
 from redis import Redis
 from blog_spider.config import config
 
+#   Warning
+#   这个类不能用于分布式或者多多进程
 
 class WordIndexer:
 
@@ -21,13 +23,16 @@ class WordIndexer:
             self.server.watch(self.key)
             hlen = self.server.hlen(self.key)
             self.server.execute_command("multi")
-            self.server.hset(self.key,word,hlen + 1)
+            self.server.hset(self.key,word,hlen)
             res = self.server.execute_command("exec")
             if res is not None :
-                return hlen + 1
+                return hlen
 
     def get_dic(self):
         return self.server.hgetall(self.key)
+
+    def __len__(self):
+        return self.server.hlen(self.key)
 
     def __del__(self):
         self.server.delete(self.key)

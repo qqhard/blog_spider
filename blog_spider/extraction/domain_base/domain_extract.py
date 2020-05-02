@@ -14,12 +14,12 @@ from blog_spider.util.index_word import WordIndexer
 no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
                    'font', 'center']
 
-path_tags = ['body', 'div', 'section', ]
+path_tags = ['body', 'div', 'section', 'main', 'nav', 'article']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
 
-indexer = None
+indexer: WordIndexer = None
 
 
 def get_new_path(tag: Tag, xpath):
@@ -33,7 +33,6 @@ def get_new_path(tag: Tag, xpath):
             add_xpath = add_xpath + "." + str.strip(re.sub(escape_re, escape_replace, cls))
             break
     if add_xpath != "":
-        add_xpath = indexer.get_index(add_xpath)
         xpath.append(add_xpath)
     return xpath
 
@@ -46,7 +45,7 @@ def get_path_content_func(contents=[]):
             return contents
         if isinstance(content, str):
             content = content.strip()
-            content != "" and contents.append((xpath[:], content.strip()))
+            content != "" and contents.append((xpath[:], len(content.strip())))
             return contents
         tag: Tag = content
         if tag.name in no_content_tags:
@@ -81,14 +80,13 @@ def get_condense_html_tree(html, *args, **kwargs):
     soup = BeautifulSoup(html, "html5lib")
     contents = get_path_content_func([])(soup, [])
     ctree = []
+
     for xpath, content in contents:
         for i, path in enumerate(xpath):
-            if len(ctree) == i:
-                ctree.append({path})
-            else:
-                ctree[i].add(path)
-    for i , s in enumerate(ctree):
-        ctree[i] = list(s)
+            idx = indexer.get_index(path)
+            while idx >= len(ctree):
+                ctree.append(0)
+            ctree[idx] += i + 1
     return ctree
 
 
@@ -97,7 +95,7 @@ def process_domain(domain: str):
     indexer = WordIndexer(key="INDEXER_" + domain)
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
-    condense_raw: Collection = client.spider.condense_raw
+    condense_raw: Collection = client.spider.vector_domain
     for doc in coll.find({"domain": domain}):
         r = get_condense_html_tree(doc['html'], doc['url'], doc['domain'])
         condense_raw.update_one({"domain": domain}, {"$push": {
@@ -107,17 +105,20 @@ def process_domain(domain: str):
                 'condense_data': r,
             }}}, upsert=True)
 
-    condense_raw.update_one({"domain": domain}, {"$set":{"domain_dict": indexer.get_dic()}}, upsert=True)
+    condense_raw.update_one({"domain": domain}, {"$set": {
+        "domain_dict": indexer.get_dic(),
+        "domain_dimension":len(indexer)
+    }}, upsert=True)
     del indexer
+
 
 def process_all_domain():
     client = MongoClient(config.spider_mongo_str)
-    dcoll :Collection = client.spider.candidate_domain
+    dcoll: Collection = client.spider.candidate_domain
     domain_list = list(dcoll.find())
     for cdoc in domain_list:
         domain = cdoc['domain']
         process_domain(domain)
-
 
 
 if __name__ == '__main__':

@@ -103,7 +103,7 @@ def process_domain(domain):
 def process_all():
     client = MongoClient(config.spider_mongo_str)
     vdata : Collection = client.spider.vector_domain
-    coll_cluster :Collection = client.domain_cluster
+    coll_cluster :Collection = client.spider.domain_cluster
     domains = list(vdata.aggregate([{'$group': {"_id": "$domain"}}]))
     for data in domains :
         domain = data['_id']

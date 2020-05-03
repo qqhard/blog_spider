@@ -9,6 +9,7 @@ import random
 from functools import reduce
 import pandas as pd
 from blog_spider.util.list import resize
+from pymongo import InsertOne
 
 sample_num = 500
 
@@ -60,7 +61,7 @@ def get_threshold_distance(vectors):
         ib = ia
         while ib == ia:
             ib = random.randint(0, l - 1)
-        dis = cal_distance(vectors[ia],vectors[ib])
+        dis = cal_distance(vectors[ia], vectors[ib])
         sum += dis
         diss.append(dis)
     diss.sort()
@@ -76,39 +77,60 @@ def process_domain_test(domain_data):
         print(i, dis)
 
 
+def recore(core,  vector):
+    lc = len(core)
+    lv = len(vector)
+    lm = max(lc, lv)
+    newcore = [0] * lm
+
+    for i in range(lm):
+        if i < lc:
+            newcore[i] += core[i] / 2
+        if i < lv:
+            newcore[i] += vector[i] / 2
+    return newcore
+
 
 def process_domain(domain):
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.vector_domain
     vectors = []
-    identifys= []
-    for vdata in coll.find({"domain":domain}):
+    identifys = []
+    for vdata in coll.find({"domain": domain}):
         vectors.append(vdata['condense_data'])
-        identifys.append((vdata['url'],vdata['incid']))
+        identifys.append((vdata['url'], vdata['incid']))
     threshold = get_threshold_distance(vectors)
+    cls_coll: Collection = client.spider.domain_clusters
     clusters = []
-    for i,vector in enumerate(vectors) :
+    ops = []
+
+    for i, vector in enumerate(vectors):
         nc = True
-        for cluster in clusters:
-            for identify,svector in cluster :
-                if cal_distance(vector,svector) < threshold :
-                    nc = False
-                    cluster.append((identifys[i],vector))
+        for k, core in enumerate(clusters):
+            if cal_distance(core, vector) < threshold:
+                ops.append(
+                    InsertOne({"domain": domain, "url": identifys[i][0], "incid": identifys[i][1], "class": k + 1}))
+                nc = False
                 break
-        if nc is True :
-            clusters.append([(identifys[i],vector)])
-    clusters = list(map(lambda x : list(map(lambda y:y[0],x)),clusters))
+
+        if nc is True:
+            clusters.append(vector)
+            ops.append(
+                InsertOne({"domain": domain, "url": identifys[i][0], "incid": identifys[i][1], "class": len(clusters)}))
+    cls_coll.bulk_write(ops)
     return clusters
+
 
 def process_all():
     client = MongoClient(config.spider_mongo_str)
-    vdata : Collection = client.spider.vector_domain
-    coll_cluster :Collection = client.spider.domain_cluster
+    vdata: Collection = client.spider.vector_domain
+    coll_cluster: Collection = client.spider.domain_cluster
     domains = list(vdata.aggregate([{'$group': {"_id": "$domain"}}]))
-    for data in domains :
+    for data in domains:
         domain = data['_id']
         res = process_domain(domain)
-        coll_cluster.insert_one({"domain":domain,"cluster":res})
+        coll_cluster.insert_one({"domain": domain, "cluster": res})
+
 
 if __name__ == '__main__':
     process_all()

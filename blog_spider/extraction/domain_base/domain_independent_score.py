@@ -21,12 +21,14 @@ def process_domain(domain):
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
     ds_map_record = client.spider.domain_sentence_map.find_one({"domain": domain})
     dcs: Collection = client.spider.domain_clusters
+    dcm: Collection = client.spider.domain_cluster_map
     domain_independent_score: Collection = client.spider.domain_independent_score
     ds_map = ds_map_record['map']
     clss = list(dcs.aggregate([{"$match": {"domain": domain}}, {'$group': {"_id": {"class": "$class"}}}]))
     for cls_doc in clss:
         cls = cls_doc['_id']['class']
-        dc_map = client.spider.domain_cluster_map.find_one({"domain": domain, "class": cls})['map']
+        map_doc = dcm.find_one({"domain": domain, "class": cls})
+        dc_map = map_doc['map']
         opts = []
         for data in dcs.find({"domain": domain, "class": cls}):
             incid = data['incid']

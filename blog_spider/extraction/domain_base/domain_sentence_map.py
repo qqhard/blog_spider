@@ -58,7 +58,7 @@ def summer_domain(domain):
     dsm :Collection = client.spider.domain_sentense_map
 
     dic = {}
-    for data in dcm.find():
+    for data in dcm.find({"domain":domain}):
         m = data['map']
         for key in m :
             if dic.get(key) is None :

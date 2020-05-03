@@ -16,7 +16,9 @@ def process_domain(domain):
     client = MongoClient(config.spider_mongo_str)
     dis : Collection = client.spider.domain_independent_score
     dcscore : Collection = client.spider.domain_cluster_score
-    for score in dcscore.find({"domain":domain}).sort("score") :
+    dscores = list(dcscore.find({"domain":domain}))
+    dscores.sort(key=lambda x:x['score'][1])
+    for score in dscores:
         cls = score['class']
         s = score['score']
         for data in dis.find({"domain":domain,"class":cls}):

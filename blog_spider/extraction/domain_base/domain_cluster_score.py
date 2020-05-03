@@ -23,8 +23,12 @@ def process_domain(domain):
         map_doc = dcm.find_one({"domain": domain, "class": cls})
         dc_map :dict= map_doc['map']
         score = 0
+        unreplace = 0
         for key in dc_map :
             score += math.exp(-(ds_map[key]-dc_map[key]))
+            if dc_map[key]  == ds_map[key]:
+                unreplace += 1
+
         kic = 0
         for key in ds_map :
             if dc_map.get(key) is not None:
@@ -32,10 +36,11 @@ def process_domain(domain):
 
         score = score/len(dc_map)
         krate = kic/len(ds_map)
+        urate = unreplace/len(dc_map)
         domain_cluster_score.insert_one({
             "domain":domain,
             "class":cls,
-            "score":[score,krate]
+            "score":[score,krate,urate]
         })
 
 

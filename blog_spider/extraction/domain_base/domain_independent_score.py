@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import hashlib
 import re
 import math
+from blog_spider.extraction.domain_base.cache import get_cluster
 
 
 def md5hash(word: str):
@@ -19,40 +20,48 @@ def process_domain(domain):
     client = MongoClient(config.spider_mongo_str)
     coll: Collection = client.spider.extend_raw_doc_2020_04_29
     ds_map_record = client.spider.domain_sentence_map.find_one({"domain": domain})
-    ds_map = ds_map_record['map']
+    dcs: Collection = client.spider.domain_clusters
     domain_independent_score: Collection = client.spider.domain_independent_score
-    opts = []
-    for doc in coll.find({"domain": domain}):
-        html = doc['html']
-        soup = BeautifulSoup(html, "html5lib")
-        text = soup.text
-        words = re.split("\W", text)
-        word_count = 0
-        score = 0
-        for word in words:
-            word = word.strip()
-            if word == "":
-                continue
-            h = md5hash(word)
-            rate = ds_map.get(h)
-            score += math.exp(-rate)
-            word_count += 1
-        domain_score = 0 if word_count == 0 else score / word_count
-        opts.append(InsertOne({
-            "incid": doc['incid'],
-            'url': doc['url'],
-            'domain': domain,
-            'score': domain_score
-        }))
-    domain_independent_score.bulk_write(opts)
+    ds_map = ds_map_record['map']
+    clss = list(dcs.aggregate([{"$match": {"domain": domain}}, {'$group': {"_id": {"class": "$class"}}}]))
+    for cls_doc in clss:
+        cls = cls_doc['_id']['class']
+        dc_map = client.spider.domain_cluster_map.find_one({"domain": domain, "class": cls})['map']
+        opts = []
+        for data in dcs.find({"domain": domain, "class": cls}):
+            incid = data['incid']
+            doc = coll.find_one({"incid": incid})
+            html = doc['html']
+            soup = BeautifulSoup(html, "html5lib")
+            text = soup.text
+            words = re.split("\W", text)
+            word_count = 0
+            score = 0
+            for word in words:
+                word = word.strip()
+                if word == "":
+                    continue
+                h = md5hash(word)
+                rate = ds_map.get(h) - dc_map.get(h)
+                score += math.exp(-rate)
+                word_count += 1
+            doc_score = 0 if word_count == 0 else score / word_count
+            opts.append(InsertOne({
+                "incid": doc['incid'],
+                'url': doc['url'],
+                'domain': domain,
+                "class": cls,
+                'score': doc_score
+            }))
+        domain_independent_score.bulk_write(opts)
 
 
 def process_all():
     client = MongoClient(config.spider_mongo_str)
-    domain_sentence_map: Collection = client.spider.domain_sentence_map
-    domains = list(domain_sentence_map.aggregate([{'$group': {"_id": "$domain"}}]))
+    dcs: Collection = client.spider.domain_clusters
+    domains = list(dcs.aggregate([{'$group': {"_id": {"domain": "$domain"}}}]))
     for data in domains:
-        domain = data['_id']
+        domain = data['_id']['domain']
         process_domain(domain)
 
 

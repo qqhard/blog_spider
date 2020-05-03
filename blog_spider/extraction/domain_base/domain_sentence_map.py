@@ -68,8 +68,6 @@ def summer_domain(domain):
     dsm.insert_one({"domain":domain,"map":dic})
 
 
-
-
 def summer_dict():
     client = MongoClient(config.spider_mongo_str)
     dcm: Collection = client.spider.domain_cluster_map

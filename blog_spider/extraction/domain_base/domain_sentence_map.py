@@ -55,7 +55,7 @@ def process_all():
 def summer_domain(domain):
     client = MongoClient(config.spider_mongo_str)
     dcm: Collection = client.spider.domain_cluster_map
-    dsm :Collection = client.spider.domain_sentense_map
+    dsm :Collection = client.spider.domain_sentence_map
 
     dic = {}
     for data in dcm.find({"domain":domain}):

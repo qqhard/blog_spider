@@ -17,7 +17,7 @@ def process_domain(domain):
     dis : Collection = client.spider.domain_independent_score
     dcscore : Collection = client.spider.domain_cluster_score
     dscores = list(dcscore.find({"domain":domain}))
-    dscores.sort(key=lambda x:x['score'][1])
+    dscores.sort(key=lambda x:x['score'][0])
     for score in dscores:
         cls = score['class']
         s = score['score']

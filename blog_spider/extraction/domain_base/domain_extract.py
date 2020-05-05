@@ -14,12 +14,14 @@ from blog_spider.util.index_word import WordIndexer
 no_content_tags = ['script', 'style', 'svg', 'br', 'hr', 'area', 'base', 'img', 'input', 'link', 'meta', 'param', 'col',
                    'font', 'center']
 
-path_tags = ['body', 'div', 'section', 'main', 'nav', 'article']
+path_tags = ['body', 'div', 'section', 'main', 'nav', 'article','nav']
 
 escape_re = r'([\+.~`@#%&=\'\\:;<>,/\(\)])'
 escape_replace = r'\\\1'
 
 indexer: WordIndexer = None
+
+
 
 
 def get_new_path(tag: Tag, xpath):
